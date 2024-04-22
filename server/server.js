@@ -3,17 +3,23 @@ const { ApolloServer } = require("@apollo/server");
 const { expressMiddleware } = require("@apollo/server/express4");
 const path = require("path");
 const { authMiddleware } = require("./utils/auth");
+const cors = require("cors");
 
 const { typeDefs, resolvers } = require("./schemas");
 const db = require("./config/connection");
-const { start } = require("repl");
 
 const PORT = process.env.PORT || 3001;
 const app = express();
+
+app.use(cors());
+
 const server = new ApolloServer({
   typeDefs,
   resolvers,
   context: authMiddleware,
+  cors: {
+    credentials: true,
+  },
 });
 
 // Create new instance of ApolloServer and pass in our schema data
@@ -35,10 +41,10 @@ const startApolloServer = async () => {
 };
 
 db.once("open", async () => {
-  await startApolloServer();
-
   app.listen(PORT, () => {
     console.log(`API server running on port ${PORT}!`);
     console.log(`Use GraphQL at http://localhost:${PORT}/graphql`);
   });
 });
+
+startApolloServer();
