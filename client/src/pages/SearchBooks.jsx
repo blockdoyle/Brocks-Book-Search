@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { Container, Col, Form, Button, Card, Row } from "react-bootstrap";
 
 import Auth from "../utils/auth";
+import { searchGoogleBooks } from "../utils/API";
 import { useMutation } from "@apollo/client";
 import { SAVE_BOOK } from "../utils/mutations";
-import { searchGoogleBooks } from "../utils/API";
 import { saveBookIds, getSavedBookIds } from "../utils/localStorage";
 
 const SearchBooks = () => {
@@ -22,7 +22,9 @@ const SearchBooks = () => {
     return () => saveBookIds(savedBookIds);
   });
 
+  // create saveBook mutation
   const [saveBook] = useMutation(SAVE_BOOK);
+
   // create method to search for books and set state on form submit
   const handleFormSubmit = async (event) => {
     event.preventDefault();
@@ -62,7 +64,6 @@ const SearchBooks = () => {
 
     // get token
     const token = Auth.loggedIn() ? Auth.getToken() : null;
-    console.log(token);
 
     if (!token) {
       return false;
@@ -71,6 +72,11 @@ const SearchBooks = () => {
     try {
       saveBook({
         variables: { bookData: { ...bookToSave } },
+        context: {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        },
       });
 
       // if book successfully saves to user's account, save book id to state
