@@ -10,7 +10,7 @@ import { Outlet } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
 
-// Create GPL api endpoint
+// Create GQL api endpoint
 const httpLink = createHttpLink({
   uri: "http://localhost:3001/graphql",
 });
